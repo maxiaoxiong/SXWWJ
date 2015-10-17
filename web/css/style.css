@@ -1,0 +1,47 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+.header {
+    display: block;
+    height: 92px;
+    width: 977px;
+    background-image: url('../image/index_top.gif');
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.welcome {
+    padding-top: 6px;
+    padding-right: 9px;
+    font-size: 0.9em;
+    text-align: right;
+}
+.main img{
+    width: 977px;
+}
+
+.am-u-md-3{
+    padding-right: 0;
+    padding-left: 0;
+}
+.index-menu img{
+    width: 977px;
+}
+.footer img{
+    width: 977px;
+}
+.item-welcome{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+#detail-header h2{
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+#detail-header span{
+    margin-left: 100px;
+}
