@@ -168,6 +168,15 @@ $this->title = "项目管理";
         $('#win').window('open');
     }
 
+    function dele(value){
+        $.getJSON('./index.php?r=admin/delete&id=' + value.name,function(data){
+            var dataJson = JSON.parse(data);
+            if(data.status == 'success'){
+                $.messager.alert("成功","删除数据成功");
+            }
+        })
+    }
+
     function update() {
         $.post('./index.php?r=admin/update', {
                 ID:$("#ID").val(),
@@ -190,8 +199,9 @@ $this->title = "项目管理";
                 Res_Exp: KindEditor.instances[11].html(),
             },
             function (data) {
-                data = JSON.parse(data);
-                if (data.success) {
+                console.log(data);
+                var dataJson = JSON.parse(data);
+                if (dataJson.status == 'success') {
                     $.messager.alert('成功', '更新信息成功');
                 } else if (data.error) {
                     $("#error").window('close');

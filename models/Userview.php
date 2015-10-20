@@ -11,6 +11,10 @@ namespace app\models;
 use yii\db\ActiveRecord;
 
 class Userview extends ActiveRecord{
+    public static function tableName()
+    {
+        return 'userview';
+    }
     public function rules()
     {
         return [

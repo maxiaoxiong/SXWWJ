@@ -15,8 +15,6 @@ use app\models\Membership;
 use app\models\Users;
 use app\models\UsersInRoles;
 use app\models\Map;
-use app\models\Roles;
-use yii\web\Session;
 error_reporting( E_ALL&~E_NOTICE );
 class AdminController extends Controller
 {
@@ -25,8 +23,12 @@ class AdminController extends Controller
 
     public function actionIndex()
     {
-        $this->checkSession();
-        return $this->renderPartial('index');
+        $a = $this->checkSession();
+        if($a == 1){
+            return $this->renderPartial('index');
+        }else{
+            $this->redirect('index.php?r=site/index');
+        }
     }
 
     public function actionItem()
@@ -37,7 +39,7 @@ class AdminController extends Controller
         $arr = array();
         foreach ($results as $k => $v) {
             $v['Item_Edit'] = "<a href=\"#\" name=\"$v[ID]\" class=\"easyui-linkbutton\" data-options=\"iconCls:'icon-edit',plain:true\" onclick='edit(this)'>编辑</a>
-                                <a href=\"#\" name=\"$v[ID]\" class=\"easyui-linkbutton\" data-options=\"iconCls:'icon-remove',plain:true\">删除</a>
+                                <a href=\"#\" name=\"$v[ID]\" class=\"easyui-linkbutton\" data-options=\"iconCls:'icon-remove',plain:true\" onclick='dele(this)'>删除</a>
                                 ";
             $arr[$k] = $v;
         }
@@ -76,16 +78,10 @@ class AdminController extends Controller
     public function actionUpdate()
     {
         if(Yii::$app->request->isPost){
+
             $data = Yii::$app->request->post();
             $ID = $data['ID'];
             $post1 = Item::findOne($ID);
-            $map = Map::findOne($ID);
-
-            $map->ItemID = $data['Item_NO'];
-            $map->Lng = $data['Lng'];
-            $map->Lat = $data['Lat'];
-            $map->Tip_info = $data['Item_Name'];
-
             $post1->Item_NO = $data['Item_NO'];
             $post1->Item_Name = $data['Item_Name'];
             $post1->Item_Position = $data['Item_Position'];
@@ -102,18 +98,23 @@ class AdminController extends Controller
             $post1->Res_Protect = $data['Res_Protect'];
             $post1->Res_Exp = $data['Res_Exp'];
             $post1->save();
+
+            $map = Map::findOne($ID);
+            $map->ItemID = $data['Item_NO'];
+            $map->Lng = $data['Lng'];
+            $map->Lat = $data['Lat'];
+            $map->Tip_info = $data['Item_Name'];
             $map->save();
 
-            $data['success'] = 'success';
-            $data = json_encode($data);
-            return $data;
+            $da['status'] = 'success';
+            $da = json_encode($da);
+            echo $da;
         }
     }
 
     public function actionAdd()
     {
         $this->checkSession();
-
         if(Yii::$app->request->isPost){
             $data = Yii::$app->request->post();
             $post1 = new Item;
@@ -151,6 +152,15 @@ class AdminController extends Controller
         }else{
             return $this->render('add');
         }
+    }
+
+    public function actionDelete(){
+        $id = $_GET['id'];
+        $sql = "delete from Item i,Map m where i.ID = " . $id." and m.id = ". $id;
+        $results = Item::findBySql($sql);
+        $data['status'] = 'success';
+        $data = json_encode($data);
+        return $data;
     }
 
     public function actionReg()
@@ -267,7 +277,6 @@ class AdminController extends Controller
 
     public function actionUserlogin()
     {
-
         $request = Yii::$app->request;
         $username = $request->post('username');
         $result = Userview::find()->where(['UserName' => $username])->asArray()->all();
@@ -276,6 +285,7 @@ class AdminController extends Controller
             $session = Yii::$app->session;
             $session->open();
             $session['username'] = $username;
+            $session['roleid'] = $result[0]['RoleId'];
             if($result[0]['RoleId'] == "{AAED6BBE-1DB4-4BF0-B53B-E45F235734D2}")
             {
                 $resData['status'] = 'success1';
@@ -297,10 +307,19 @@ class AdminController extends Controller
     public function checkSession()
     {
         $session = Yii::$app->session;
-        if($session['username'] == ''){
+        if($session['username'] != '' && $session['roleid'] == '{AAED6BBE-1DB4-4BF0-B53B-E45F235734D2}'){
+            return 1;
+        }elseif($session['username'] == ''){
             return $this->redirect('index.php?r=site/index');
+        }elseif($session['username'] != '' && $session['roleid'] == ''){
+            return $this->redirect('index.php?r=item/index');
         }
     }
 
 
+    public function actionLogout()
+    {
+        session_start();
+        session_destroy();
+    }
 }

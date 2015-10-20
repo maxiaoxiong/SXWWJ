@@ -10,12 +10,17 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 
 class SiteController extends Controller{
+    public $enableCsrfValidation = false;
 
     public $layout = 'indexLayout';
 
     public function actionIndex(){
         return $this->render('index');
     }
+
+
+
+
 
 //    public function behaviors()
 //    {

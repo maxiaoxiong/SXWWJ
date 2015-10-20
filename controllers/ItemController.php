@@ -10,6 +10,7 @@ use yii\web\Session;
 
 class ItemController extends Controller{
     public $layout = 'itemLayout';
+    public $enableCsrfValidation = false;
 
     public function actionIndex(){
         $this->checkSession();

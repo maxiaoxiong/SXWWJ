@@ -10,5 +10,8 @@ namespace app\models;
 use yii\db\ActiveRecord;
 
 class Positionview extends ActiveRecord{
-
+    public static function tableName()
+    {
+        return 'positionview';
+    }
 }

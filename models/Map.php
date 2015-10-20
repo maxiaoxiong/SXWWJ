@@ -11,5 +11,8 @@ namespace app\models;
 use yii\db\ActiveRecord;
 
 class Map extends ActiveRecord{
-
+    public static function tableName()
+    {
+        return 'Map';
+    }
 }
