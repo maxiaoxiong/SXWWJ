@@ -170,9 +170,14 @@ $this->title = "项目管理";
 
     function dele(value){
         $.getJSON('./index.php?r=admin/delete&id=' + value.name,function(data){
-            var dataJson = JSON.parse(data);
+            console.log(data);
             if(data.status == 'success'){
-                $.messager.alert("成功","删除数据成功");
+                $.messager.alert("成功","删除数据成功,刷新页面中..");
+                setTimeout(function () {
+                    history.go(0);
+                })
+            }else{
+                $.messager.alert("失败","删除数据失败");
             }
         })
     }

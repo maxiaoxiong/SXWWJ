@@ -15,7 +15,9 @@ use app\models\Membership;
 use app\models\Users;
 use app\models\UsersInRoles;
 use app\models\Map;
-error_reporting( E_ALL&~E_NOTICE );
+
+error_reporting(E_ALL & ~E_NOTICE);
+
 class AdminController extends Controller
 {
     public $enableCsrfValidation = false;
@@ -24,9 +26,9 @@ class AdminController extends Controller
     public function actionIndex()
     {
         $a = $this->checkSession();
-        if($a == 1){
+        if ($a == 1) {
             return $this->renderPartial('index');
-        }else{
+        } else {
             $this->redirect('index.php?r=site/index');
         }
     }
@@ -77,7 +79,7 @@ class AdminController extends Controller
 
     public function actionUpdate()
     {
-        if(Yii::$app->request->isPost){
+        if (Yii::$app->request->isPost) {
 
             $data = Yii::$app->request->post();
             $ID = $data['ID'];
@@ -115,7 +117,7 @@ class AdminController extends Controller
     public function actionAdd()
     {
         $this->checkSession();
-        if(Yii::$app->request->isPost){
+        if (Yii::$app->request->isPost) {
             $data = Yii::$app->request->post();
             $post1 = new Item;
             $map = new Map;
@@ -140,27 +142,38 @@ class AdminController extends Controller
             $post1->Res_Exp = $data['Res_Exp'];
             $map->save();
             $results = $post1->save();
-            if($results){
+            if ($results) {
                 $data['success'] = 'success';
                 $data = json_encode($data);
                 return $data;
-            }else{
+            } else {
                 $data['error'] = 'error';
                 $data = json_encode($data);
                 return $data;
             }
-        }else{
+        } else {
             return $this->render('add');
         }
     }
 
-    public function actionDelete(){
+    public function actionDelete()
+    {
         $id = $_GET['id'];
-        $sql = "delete from Item i,Map m where i.ID = " . $id." and m.id = ". $id;
-        $results = Item::findBySql($sql);
-        $data['status'] = 'success';
-        $data = json_encode($data);
-        return $data;
+//        $sql = "delete from Item i,Map m where i.ID = " . $id . " and m.id = " . $id;
+        $res = Item::find()->where(['ID' => $id])->all();
+        $row1 = $res[0]->delete();
+        $res = Map::find()->where(['id' => $id])->all();
+        $row2 = $res[0]->delete();
+        if ($row1 != 0 && $row2 != 0) {
+            $data['status'] = 'success';
+            $data = json_encode($data);
+            return $data;
+        } else {
+            $data['status'] = 'error';
+            $data = json_encode($data);
+            return $data;
+        }
+
     }
 
     public function actionReg()
@@ -286,12 +299,11 @@ class AdminController extends Controller
             $session->open();
             $session['username'] = $username;
             $session['roleid'] = $result[0]['RoleId'];
-            if($result[0]['RoleId'] == "{AAED6BBE-1DB4-4BF0-B53B-E45F235734D2}")
-            {
+            if ($result[0]['RoleId'] == "{AAED6BBE-1DB4-4BF0-B53B-E45F235734D2}") {
                 $resData['status'] = 'success1';
                 $resData['data'] = $result;
-                echo  json_encode($resData);
-                return ;
+                echo json_encode($resData);
+                return;
             }
             $resData['status'] = 'success';
             $resData['data'] = $result;
@@ -307,11 +319,11 @@ class AdminController extends Controller
     public function checkSession()
     {
         $session = Yii::$app->session;
-        if($session['username'] != '' && $session['roleid'] == '{AAED6BBE-1DB4-4BF0-B53B-E45F235734D2}'){
+        if ($session['username'] != '' && $session['roleid'] == '{AAED6BBE-1DB4-4BF0-B53B-E45F235734D2}') {
             return 1;
-        }elseif($session['username'] == ''){
+        } elseif ($session['username'] == '') {
             return $this->redirect('index.php?r=site/index');
-        }elseif($session['username'] != '' && $session['roleid'] == ''){
+        } elseif ($session['username'] != '' && $session['roleid'] == '') {
             return $this->redirect('index.php?r=item/index');
         }
     }
