@@ -87,19 +87,10 @@ $('#itemData').datagrid({
 })(jQuery);
 
 $(function(){
-    $.getJSON("?r=item/init", function (res) {
-        console.log(res.Item_NO);
-        $('#itemData').datagrid('clientPaging');
-        $.get("?r=item/item&act=GBI&ItemID="+res.Item_NO, function (res) {
-            setDetail(res);
-        })
+    $('#itemData').datagrid('clientPaging');
+    $.get("?r=item/item&act=GBI&ItemID=5-257-63", function (res) {
+        setDetail(res);
     })
-    $('#btn').mousemove(
-        function () {
-            $('#itemData').datagrid('getSelected');
-        }
-    )
-
 });
 
 
@@ -113,12 +104,6 @@ function show() {
             setDetail(result2)
         })
     }
-}
-
-function mapShow (id){
-    getItemByItemNO(id,function(result2){
-        setDetail(result2)
-    })
 }
 var getPosition = function (id, callback) {
     $.get("?r=item/position&act=getById&ItemID=" + id, function (res) {
@@ -140,7 +125,7 @@ var getItemByItemNO = function(id,callback){
 
 var setDetail = function(res){
     var jsonObj = JSON.parse(res);
-    var str = jsonObj.data;
+    var str = jsonObj.data[0];
     $("#sysid").html(str.ID);
     $("#ItemNO").html(str.Item_NO);
     $("#ItemName").html(str.Item_Name);
@@ -180,12 +165,13 @@ var opts = {
 
 getBoundary();
 
-function addMarker(point,name,ItemNO,location){
+
+function addMarker(point,name,ItemNO){
     var marker = new BMap.Marker(point);
     map.addOverlay(marker);
     var label = new BMap.Label(name,{offset:new BMap.Size(20,-10)});
     marker.setLabel(label);
-    var infoWindow = new BMap.InfoWindow("<br/>项目ID："+ItemNO+"<br/>"+"项目名称："+name+"<br/>地理位置："+location+"<br/><br/><button onclick=mapShow('"+ItemNO+"')>点击查看详情</button>", opts);
+    var infoWindow = new BMap.InfoWindow("<br/>项目ID："+ItemNO+"<br/>"+"项目名称："+name+"<br/><br/><button>点击查看详情</button>", opts);
     marker.addEventListener("click", function(){
         map.openInfoWindow(infoWindow,point); //开启信息窗口
     });
@@ -193,7 +179,7 @@ function addMarker(point,name,ItemNO,location){
 
 for(var i = 0; i<PosArr.length;i++){
     var point = new BMap.Point(PosArr[i].Lng,PosArr[i].Lat);
-    addMarker(point,PosArr[i].Item_Name,PosArr[i].ItemID,PosArr[i].Item_Position);
+    addMarker(point,PosArr[i].Item_Name,PosArr[i].ItemID);
 }
 
 

@@ -56,7 +56,7 @@ class ItemController extends Controller{
         $result = Item::find()->where(['Item_NO'=>$id])->asArray()->all();
         if(count($result) != 0){
             $resData['status'] = 'success';
-            $resData['data'] = $result;
+            $resData['data'] = $result[0];
             return json_encode($resData);
         }else{
             $result = array();
@@ -92,6 +92,14 @@ class ItemController extends Controller{
             $resData['data'] = $result;
             return json_encode($resData);
         }
+    }
+
+    public function actionInit()
+    {
+        $result = Item::find()->min('ID');
+        $result = Item::find()->where(['ID'=>$result])->one();
+        $data['Item_NO'] = $result['Item_NO'];
+        return json_encode($data);
     }
 
     public function checkSession()
