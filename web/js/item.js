@@ -14,8 +14,8 @@ $('#itemData').datagrid({
         {field: 'Item_Position', title: '位置', width: 100},
         {
             field: 'opt', title: '操作', width: 50, align: 'center',
-            formatter: function (value, rec) {
-                var btn = "<a class='' href='javascript:;' onclick='show()'>查看</a>";
+            formatter: function (Item_NO, rec) {
+                var btn = "<a class='' href='javascript:;' onclick='show()' name=Item_NO>查看</a>";
                 return btn;
             }
         }
@@ -104,6 +104,10 @@ $(function(){
 
 
 function show() {
+    setTimeout(show1,1);
+}
+
+function show1(){
     var selected = $('#itemData').datagrid('getSelected');
     if (selected) {
         getPosition(selected.Item_NO, function (result) {
