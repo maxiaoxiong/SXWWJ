@@ -25,9 +25,11 @@ $this->title = "项目添加";
         </tr>
         <tr>
             <td style="width: 25%;font-size: 20px"><label for="Item_Position">项目地理位置:</label></td>
+            <div id="l-map" class="hidden"></div>
             <td><input class="easyui-validatebox" id="Item_Position" type="text" name="Item_Position"
-                       data-options="validType:'ture'"/>&nbsp;&nbsp;
+                       data-options="validType:'ture'"/>
             </td>
+            <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
             <td><input type="hidden" id="Lng" name="Lng"></td>
             <td><input type="hidden" id="Lat" name="Lat"></td>
 
@@ -116,38 +118,39 @@ $this->title = "项目添加";
             })
     }
 
-    $('#Item_Position').blur(function () {
-        var map = new BMap.Map("allmap");
-        //var city = document.getElementById("").value;
+   $('#Item_Position').blur(function () {
+       var map = new BMap.Map("allmap");
+       //var city = document.getElementById("").value;
 
-        var localSearch = new BMap.LocalSearch(map);
-        localSearch.enableAutoViewport(); //允许自动调节窗体大小
+       var localSearch = new BMap.LocalSearch(map);
+       localSearch.enableAutoViewport(); //允许自动调节窗体大小
 
-        var keyword = document.getElementById("Item_Position").value;
-        localSearch.setSearchCompleteCallback(function (searchResult) {
-            var poi = searchResult.getPoi(0);
-            document.getElementById("Lng").value = poi.point.lng;
-            document.getElementById("Lat").value = poi.point.lat;
-//            console.log(poi.point.lng + ':' + poi.point.lat);
-        });
-        localSearch.search(keyword);
-    });
+       var keyword = document.getElementById("Item_Position").value;
+       localSearch.setSearchCompleteCallback(function (searchResult) {
+           var poi = searchResult.getPoi(0);
+           document.getElementById("Lng").value = poi.point.lng;
+           document.getElementById("Lat").value = poi.point.lat;
+           console.log(poi.point.lng + ':' + poi.point.lat);
+       });
+       localSearch.search(keyword);
+   });
 
-    function theLocation() {
-        var map = new BMap.Map("allmap");
-        //var city = document.getElementById("").value;
 
-        var localSearch = new BMap.LocalSearch(map);
-        localSearch.enableAutoViewport(); //允许自动调节窗体大小
-
-        var keyword = document.getElementById("Item_Position").value;
-        localSearch.setSearchCompleteCallback(function (searchResult) {
-            var poi = searchResult.getPoi(0);
-            document.getElementById("Lng").value = poi.point.lng;
-            document.getElementById("Lat").value = poi.point.lat;
-        });
-        localSearch.search(keyword);
-    }
+//    function theLocation() {
+//        var map = new BMap.Map("allmap");
+//        //var city = document.getElementById("").value;
+//
+//        var localSearch = new BMap.LocalSearch(map);
+//        localSearch.enableAutoViewport(); //允许自动调节窗体大小
+//
+//        var keyword = document.getElementById("Item_Position").value;
+//        localSearch.setSearchCompleteCallback(function (searchResult) {
+//            var poi = searchResult.getPoi(0);
+//            document.getElementById("Lng").value = poi.point.lng;
+//            document.getElementById("Lat").value = poi.point.lat;
+//        });
+//        localSearch.search(keyword);
+//    }
 
     KindEditor.ready(function (K) {
         window.editor1 = K.create('#Item_Info', {

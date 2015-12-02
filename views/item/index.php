@@ -92,12 +92,11 @@ $this->title = '文物数据库';
     var Position = <?= $PositionData; ?>;
     function dele() {
         $.post('./index.php?r=admin/logout', function (data) {
-            var dataJson = JSON.parse(data);
-            if (dataJson.status == 'success') {
+            if (data.status == 'success') {
+                $.messager.alert("失败", "未注销");
+            } else {
                 $.messager.alert("成功", "已注销");
                 location.href = "index.php?r=site/index";
-            } else {
-                $.messager.alert("失败", "未注销");
             }
         })
     }

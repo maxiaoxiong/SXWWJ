@@ -35,11 +35,13 @@ $this->title = "项目管理";
             </tr>
             <tr>
                 <td style="width: 25%;font-size: 20px"><label for="Item_Position">项目地理位置:</label></td>
-                <td><input class="easyui-validatebox" id="Item_Position" type="text" name="Item_Position"
-                           data-options="validType:'ture'"/>&nbsp;&nbsp;
-                </td>
-                <td><input type="hidden" id="Lng" name="Lng"></td>
-                <td><input type="hidden" id="Lat" name="Lat"></td>
+                <div id="l-map" class="hidden"></div>
+            <td><input class="easyui-validatebox" id="Item_Position" type="text" name="Item_Position"
+                       data-options="validType:'ture'"/>
+            </td>
+            <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
+            <td><input type="hidden" id="Lng" name="Lng"></td>
+            <td><input type="hidden" id="Lat" name="Lat"></td>
 
             </tr>
         </table>
@@ -110,22 +112,24 @@ $this->title = "项目管理";
         dg.datagrid('enableFilter');
     });
 
-    $('#Item_Position').blur(function () {
-        var map = new BMap.Map("allmap");
-        //var city = document.getElementById("").value;
+    // $('#Item_Position').blur(function () {
+    //     var map = new BMap.Map("allmap");
+    //     //var city = document.getElementById("").value;
 
-        var localSearch = new BMap.LocalSearch(map);
-        localSearch.enableAutoViewport(); //允许自动调节窗体大小
+    //     var localSearch = new BMap.LocalSearch(map);
+    //     localSearch.enableAutoViewport(); //允许自动调节窗体大小
 
-        var keyword = document.getElementById("Item_Position").value;
-        localSearch.setSearchCompleteCallback(function (searchResult) {
-            var poi = searchResult.getPoi(0);
-            document.getElementById("Lng").value = poi.point.lng;
-            document.getElementById("Lat").value = poi.point.lat;
-            console.log(poi.point.lng + ':' + poi.point.lat);
-        });
-        localSearch.search(keyword);
-    });
+    //     var keyword = document.getElementById("Item_Position").value;
+    //     localSearch.setSearchCompleteCallback(function (searchResult) {
+    //         var poi = searchResult.getPoi(0);
+    //         document.getElementById("Lng").value = poi.point.lng;
+    //         document.getElementById("Lat").value = poi.point.lat;
+    //         console.log(poi.point.lng + ':' + poi.point.lat);
+    //     });
+    //     localSearch.search(keyword);
+    // });
+
+
 
 
     function edit(value) {
@@ -136,21 +140,6 @@ $this->title = "项目管理";
                 Item_Name: data.Item_Name,
                 Item_Position: data.Item_Position,
             });	// 读取表单的URL
-            setTimeout(function() {
-                var map = new BMap.Map("allmap");
-                //var city = document.getElementById("").value;
-
-                var localSearch = new BMap.LocalSearch(map);
-                localSearch.enableAutoViewport(); //允许自动调节窗体大小
-
-                var keyword = document.getElementById("Item_Position").value;
-                localSearch.setSearchCompleteCallback(function (searchResult) {
-                    var poi = searchResult.getPoi(0);
-                    document.getElementById("Lng").value = poi.point.lng;
-                    document.getElementById("Lat").value = poi.point.lat;
-                });
-                localSearch.search(keyword);
-            },2000);
             editor1.html(data.Item_Info);
             editor2.html(data.Item_Photos);
             editor3.html(data.Item_Graphy);
@@ -166,6 +155,59 @@ $this->title = "项目管理";
 
         });
         $('#win').window('open');
+        function G(id) {
+        return document.getElementById(id);
+    }
+
+    var map = new BMap.Map("l-map");
+    map.centerAndZoom("北京",12);                   // 初始化地图,设置城市和地图级别。
+
+    var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+        {"input" : "Item_Position",
+        "location" : map
+        });
+
+    ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+        var str = "";
+        var _value = e.fromitem.value;
+        var value = "";
+        if (e.fromitem.index > -1) {
+            value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+        }
+        str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+
+        value = "";
+        if (e.toitem.index > -1) {
+            _value = e.toitem.value;
+            value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+        }
+        str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+        G("searchResultPanel").innerHTML = str;
+    });
+
+    var myValue;
+    ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+        var _value = e.item.value;
+        myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+        G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+
+        setPlace();
+    });
+
+    function setPlace(){
+        map.clearOverlays();    //清除地图上所有覆盖物
+        function myFun(){
+            var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+            document.getElementById("Lng").value = pp.lng;
+           document.getElementById("Lat").value = pp.lat;
+            console.log(pp.lng);
+            console.log(pp.lat);
+        }
+        var local = new BMap.LocalSearch(map, { //智能搜索
+            onSearchComplete: myFun
+        });
+        local.search(myValue);
+    }
     }
 
     function dele(value){
@@ -215,24 +257,24 @@ $this->title = "项目管理";
     }
 
 
-    function theLocation() {
-        var map = new BMap.Map("allmap");
-        //var city = document.getElementById("").value;
+//     function theLocation() {
+//         var map = new BMap.Map("allmap");
+//         //var city = document.getElementById("").value;
 
-        var localSearch = new BMap.LocalSearch(map);
-        localSearch.enableAutoViewport(); //允许自动调节窗体大小
+//         var localSearch = new BMap.LocalSearch(map);
+//         localSearch.enableAutoViewport(); //允许自动调节窗体大小
 
-        var keyword = document.getElementById("Item_Position").value;
-        localSearch.setSearchCompleteCallback(function (searchResult) {
-            var poi = searchResult.getPoi(0);
-            document.getElementById("Lng").value = poi.point.lng;
-            document.getElementById("Lat").value = poi.point.lat;
-            $("#Lng").val(poi.point.lng);
-            $("#Lat").val(poi.point.lat);
-//            console.log(poi.point.lng + ':' + poi.point.lat);
-        });
-        localSearch.search(keyword);
-    }
+//         var keyword = document.getElementById("Item_Position").value;
+//         localSearch.setSearchCompleteCallback(function (searchResult) {
+//             var poi = searchResult.getPoi(0);
+//             document.getElementById("Lng").value = poi.point.lng;
+//             document.getElementById("Lat").value = poi.point.lat;
+//             $("#Lng").val(poi.point.lng);
+//             $("#Lat").val(poi.point.lat);
+// //            console.log(poi.point.lng + ':' + poi.point.lat);
+//         });
+//         localSearch.search(keyword);
+//     }
 
     KindEditor.ready(function(K) {
         window.editor1 = K.create('#Item_Info',{
